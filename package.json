@@ -1,13 +1,13 @@
 {
-  "name": "impossible-finance",
+  "name": "ifv3",
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --product hosted-service masterbid/impossible-finance",
-    "create-local": "graph create --node http://localhost:8020/ masterbid/impossible-finance",
-    "remove-local": "graph remove --node http://localhost:8020/ masterbid/impossible-finance",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 masterbid/impossible-finance"
+    "deploy": "graph deploy --product hosted-service amanraj1608/ifv3",
+    "create-local": "graph create --node http://localhost:8020/ amanraj1608/ifv3",
+    "remove-local": "graph remove --node http://localhost:8020/ amanraj1608/ifv3",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 amanraj1608/ifv3"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.21.1",

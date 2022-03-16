@@ -40,32 +40,27 @@ export class PairCreated__Params {
   }
 }
 
+export class UpdatedGovernance extends ethereum.Event {
+  get params(): UpdatedGovernance__Params {
+    return new UpdatedGovernance__Params(this);
+  }
+}
+
+export class UpdatedGovernance__Params {
+  _event: UpdatedGovernance;
+
+  constructor(event: UpdatedGovernance) {
+    this._event = event;
+  }
+
+  get governance(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+}
+
 export class StableXFactory extends ethereum.SmartContract {
   static bind(address: Address): StableXFactory {
     return new StableXFactory("StableXFactory", address);
-  }
-
-  INIT_CODE_PAIR_HASH(): Bytes {
-    let result = super.call(
-      "INIT_CODE_PAIR_HASH",
-      "INIT_CODE_PAIR_HASH():(bytes32)",
-      []
-    );
-
-    return result[0].toBytes();
-  }
-
-  try_INIT_CODE_PAIR_HASH(): ethereum.CallResult<Bytes> {
-    let result = super.tryCall(
-      "INIT_CODE_PAIR_HASH",
-      "INIT_CODE_PAIR_HASH():(bytes32)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBytes());
   }
 
   allPairs(param0: BigInt): Address {
@@ -104,6 +99,29 @@ export class StableXFactory extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  approvedTokens(param0: Address): boolean {
+    let result = super.call(
+      "approvedTokens",
+      "approvedTokens(address):(bool)",
+      [ethereum.Value.fromAddress(param0)]
+    );
+
+    return result[0].toBoolean();
+  }
+
+  try_approvedTokens(param0: Address): ethereum.CallResult<boolean> {
+    let result = super.tryCall(
+      "approvedTokens",
+      "approvedTokens(address):(bool)",
+      [ethereum.Value.fromAddress(param0)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
   createPair(tokenA: Address, tokenB: Address): Address {
@@ -147,21 +165,6 @@ export class StableXFactory extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  feeToSetter(): Address {
-    let result = super.call("feeToSetter", "feeToSetter():(address)", []);
-
-    return result[0].toAddress();
-  }
-
-  try_feeToSetter(): ethereum.CallResult<Address> {
-    let result = super.tryCall("feeToSetter", "feeToSetter():(address)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
   getPair(param0: Address, param1: Address): Address {
     let result = super.call("getPair", "getPair(address,address):(address)", [
       ethereum.Value.fromAddress(param0),
@@ -183,6 +186,74 @@ export class StableXFactory extends ethereum.SmartContract {
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
+
+  governance(): Address {
+    let result = super.call("governance", "governance():(address)", []);
+
+    return result[0].toAddress();
+  }
+
+  try_governance(): ethereum.CallResult<Address> {
+    let result = super.tryCall("governance", "governance():(address)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  router(): Address {
+    let result = super.call("router", "router():(address)", []);
+
+    return result[0].toAddress();
+  }
+
+  try_router(): ethereum.CallResult<Address> {
+    let result = super.tryCall("router", "router():(address)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  routerExtension(): Address {
+    let result = super.call(
+      "routerExtension",
+      "routerExtension():(address)",
+      []
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_routerExtension(): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "routerExtension",
+      "routerExtension():(address)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  whitelist(): boolean {
+    let result = super.call("whitelist", "whitelist():(bool)", []);
+
+    return result[0].toBoolean();
+  }
+
+  try_whitelist(): ethereum.CallResult<boolean> {
+    let result = super.tryCall("whitelist", "whitelist():(bool)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
 }
 
 export class ConstructorCall extends ethereum.Call {
@@ -202,7 +273,7 @@ export class ConstructorCall__Inputs {
     this._call = call;
   }
 
-  get _feeToSetter(): Address {
+  get _governance(): Address {
     return this._call.inputValues[0].value.toAddress();
   }
 }
@@ -211,6 +282,40 @@ export class ConstructorCall__Outputs {
   _call: ConstructorCall;
 
   constructor(call: ConstructorCall) {
+    this._call = call;
+  }
+}
+
+export class ChangeTokenAccessCall extends ethereum.Call {
+  get inputs(): ChangeTokenAccessCall__Inputs {
+    return new ChangeTokenAccessCall__Inputs(this);
+  }
+
+  get outputs(): ChangeTokenAccessCall__Outputs {
+    return new ChangeTokenAccessCall__Outputs(this);
+  }
+}
+
+export class ChangeTokenAccessCall__Inputs {
+  _call: ChangeTokenAccessCall;
+
+  constructor(call: ChangeTokenAccessCall) {
+    this._call = call;
+  }
+
+  get token(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get allowed(): boolean {
+    return this._call.inputValues[1].value.toBoolean();
+  }
+}
+
+export class ChangeTokenAccessCall__Outputs {
+  _call: ChangeTokenAccessCall;
+
+  constructor(call: ChangeTokenAccessCall) {
     this._call = call;
   }
 }
@@ -283,32 +388,96 @@ export class SetFeeToCall__Outputs {
   }
 }
 
-export class SetFeeToSetterCall extends ethereum.Call {
-  get inputs(): SetFeeToSetterCall__Inputs {
-    return new SetFeeToSetterCall__Inputs(this);
+export class SetGovernanceCall extends ethereum.Call {
+  get inputs(): SetGovernanceCall__Inputs {
+    return new SetGovernanceCall__Inputs(this);
   }
 
-  get outputs(): SetFeeToSetterCall__Outputs {
-    return new SetFeeToSetterCall__Outputs(this);
+  get outputs(): SetGovernanceCall__Outputs {
+    return new SetGovernanceCall__Outputs(this);
   }
 }
 
-export class SetFeeToSetterCall__Inputs {
-  _call: SetFeeToSetterCall;
+export class SetGovernanceCall__Inputs {
+  _call: SetGovernanceCall;
 
-  constructor(call: SetFeeToSetterCall) {
+  constructor(call: SetGovernanceCall) {
     this._call = call;
   }
 
-  get _feeToSetter(): Address {
+  get _governance(): Address {
     return this._call.inputValues[0].value.toAddress();
   }
 }
 
-export class SetFeeToSetterCall__Outputs {
-  _call: SetFeeToSetterCall;
+export class SetGovernanceCall__Outputs {
+  _call: SetGovernanceCall;
 
-  constructor(call: SetFeeToSetterCall) {
+  constructor(call: SetGovernanceCall) {
+    this._call = call;
+  }
+}
+
+export class SetRouterAndExtensionCall extends ethereum.Call {
+  get inputs(): SetRouterAndExtensionCall__Inputs {
+    return new SetRouterAndExtensionCall__Inputs(this);
+  }
+
+  get outputs(): SetRouterAndExtensionCall__Outputs {
+    return new SetRouterAndExtensionCall__Outputs(this);
+  }
+}
+
+export class SetRouterAndExtensionCall__Inputs {
+  _call: SetRouterAndExtensionCall;
+
+  constructor(call: SetRouterAndExtensionCall) {
+    this._call = call;
+  }
+
+  get _router(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get _routerExtension(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+}
+
+export class SetRouterAndExtensionCall__Outputs {
+  _call: SetRouterAndExtensionCall;
+
+  constructor(call: SetRouterAndExtensionCall) {
+    this._call = call;
+  }
+}
+
+export class SetWhitelistCall extends ethereum.Call {
+  get inputs(): SetWhitelistCall__Inputs {
+    return new SetWhitelistCall__Inputs(this);
+  }
+
+  get outputs(): SetWhitelistCall__Outputs {
+    return new SetWhitelistCall__Outputs(this);
+  }
+}
+
+export class SetWhitelistCall__Inputs {
+  _call: SetWhitelistCall;
+
+  constructor(call: SetWhitelistCall) {
+    this._call = call;
+  }
+
+  get b(): boolean {
+    return this._call.inputValues[0].value.toBoolean();
+  }
+}
+
+export class SetWhitelistCall__Outputs {
+  _call: SetWhitelistCall;
+
+  constructor(call: SetWhitelistCall) {
     this._call = call;
   }
 }

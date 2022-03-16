@@ -4,7 +4,7 @@ import { ERC20 } from "../../generated/StableXFactory/ERC20"
 import { User, Bundle, Token, LiquidityPosition, LiquidityPositionSnapshot, Pair, PancakeswapToken } from "../../generated/schema"
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
-export const IMPOSSIBLE_FACTORY_ADDRESS = '0x918d7e714243f7d9d463c37e106235dcde294ffc'
+export const IMPOSSIBLE_FACTORY_ADDRESS = '0x4233Ad9B8B7C1CCf0818907908A7f0796A3dF85F'
 export const PANCAKE_FACTORY_ADDRESS = '0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73'
 
 export let ZERO_BI = BigInt.fromI32(0)

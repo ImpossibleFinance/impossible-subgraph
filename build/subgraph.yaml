@@ -6,7 +6,7 @@ dataSources:
     name: StableXFactory
     network: bsc
     source:
-      address: "0x918d7e714243f7d9d463c37e106235dcde294ffc"
+      address: "0x4233Ad9B8B7C1CCf0818907908A7f0796A3dF85F"
       abi: StableXFactory
       startBlock: 9885000
     mapping:
@@ -20,13 +20,13 @@ dataSources:
         - Bundle
       abis:
         - name: ERC20
-          file: StableXFactory\abis\IERC20.json
+          file: StableXFactory/abis/IERC20.json
         - name: StableXFactory
-          file: StableXFactory\abis\StableXFactory.json
+          file: StableXFactory/abis/StableXFactory.json
       eventHandlers:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
-      file: StableXFactory\StableXFactory.wasm
+      file: StableXFactory/StableXFactory.wasm
   - kind: ethereum/contract
     name: BUSD_WBNB_PAIR
     network: bsc
@@ -38,7 +38,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
-      file: BUSD_WBNB_PAIR\BUSD_WBNB_PAIR.wasm
+      file: BUSD_WBNB_PAIR/BUSD_WBNB_PAIR.wasm
       entities:
         - PancakeswapFactory
         - PancakeswapToken
@@ -46,13 +46,13 @@ dataSources:
         - Bundle
       abis:
         - name: ERC20
-          file: BUSD_WBNB_PAIR\abis\IERC20.json
+          file: BUSD_WBNB_PAIR/abis/IERC20.json
         - name: BUSD_WBNB_PAIR
-          file: BUSD_WBNB_PAIR\abis\BUSD_WBNB_PAIR.json
+          file: BUSD_WBNB_PAIR/abis/BUSD_WBNB_PAIR.json
         - name: PancakeFactory
-          file: BUSD_WBNB_PAIR\abis\PancakeFactory.json
+          file: BUSD_WBNB_PAIR/abis/PancakeFactory.json
         - name: StableXFactory
-          file: BUSD_WBNB_PAIR\abis\StableXFactory.json
+          file: BUSD_WBNB_PAIR/abis/StableXFactory.json
       eventHandlers:
         - event: Sync(uint112,uint112)
           handler: handleSync
@@ -67,7 +67,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
-      file: USDT_WBNB_PAIR\USDT_WBNB_PAIR.wasm
+      file: USDT_WBNB_PAIR/USDT_WBNB_PAIR.wasm
       entities:
         - PancakeFactory
         - PancakeswapToken
@@ -75,13 +75,13 @@ dataSources:
         - Bundle
       abis:
         - name: ERC20
-          file: USDT_WBNB_PAIR\abis\IERC20.json
+          file: USDT_WBNB_PAIR/abis/IERC20.json
         - name: USDT_WBNB_PAIR
-          file: USDT_WBNB_PAIR\abis\USDT_WBNB_PAIR.json
+          file: USDT_WBNB_PAIR/abis/USDT_WBNB_PAIR.json
         - name: PancakeFactory
-          file: USDT_WBNB_PAIR\abis\PancakeFactory.json
+          file: USDT_WBNB_PAIR/abis/PancakeFactory.json
         - name: StableXFactory
-          file: USDT_WBNB_PAIR\abis\StableXFactory.json
+          file: USDT_WBNB_PAIR/abis/StableXFactory.json
       eventHandlers:
         - event: Sync(uint112,uint112)
           handler: handleSync
@@ -95,7 +95,7 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
-      file: templates\ImpossiblePair\ImpossiblePair.wasm
+      file: templates/ImpossiblePair/ImpossiblePair.wasm
       entities:
         - Factory
         - Token
@@ -114,11 +114,11 @@ templates:
         - TokenDayData
       abis:
         - name: ERC20
-          file: ImpossiblePair\abis\IERC20.json
+          file: ImpossiblePair/abis/IERC20.json
         - name: Pair
-          file: ImpossiblePair\abis\Pair.json
+          file: ImpossiblePair/abis/Pair.json
         - name: StableXFactory
-          file: ImpossiblePair\abis\StableXFactory.json
+          file: ImpossiblePair/abis/StableXFactory.json
       eventHandlers:
         - event: Mint(indexed address,uint256,uint256)
           handler: handleMint

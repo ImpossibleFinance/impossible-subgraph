@@ -6,7 +6,7 @@ dataSources:
     name: StableXFactory
     network: bsc
     source:
-      address: "0x918d7e714243f7d9d463c37e106235dcde294ffc"
+      address: "0x4233Ad9B8B7C1CCf0818907908A7f0796A3dF85F"
       abi: StableXFactory
       startBlock: 9885000
     mapping:
