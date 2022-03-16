@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: StableXFactory
-    network: bsc
+    network: moonriver
     source:
       address: "0x4233Ad9B8B7C1CCf0818907908A7f0796A3dF85F"
       abi: StableXFactory
-      startBlock: 9885000
+      startBlock: 1301020
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -29,11 +29,11 @@ dataSources:
       file: StableXFactory/StableXFactory.wasm
   - kind: ethereum/contract
     name: BUSD_WBNB_PAIR
-    network: bsc
+    network: moonriver
     source:
       address: "0x58f876857a02d6762e0101bb5c46a8c1ed44dc16"
       abi: BUSD_WBNB_PAIR
-      startBlock: 9885000
+      startBlock: 1301020
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -58,11 +58,11 @@ dataSources:
           handler: handleSync
   - kind: ethereum/contract
     name: USDT_WBNB_PAIR
-    network: bsc
+    network: moonriver
     source:
       address: "0x16b9a82891338f9ba80e2d6970fdda79d1eb0dae"
       abi: USDT_WBNB_PAIR
-      startBlock: 9885000
+      startBlock: 1301020
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -88,7 +88,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: ImpossiblePair
-    network: bsc
+    network: moonriver
     source:
       abi: Pair
     mapping:
