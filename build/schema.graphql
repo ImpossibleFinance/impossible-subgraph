@@ -57,10 +57,8 @@ type PancakeswapToken @entity {
   untrackedVolumeUSD: BigDecimal!
   # transactions across all pairs
   txCount: BigInt!
-
-
-  
 }
+
 type Token @entity {
   # token address
   id: ID!
@@ -119,7 +117,6 @@ type PancakeswapPair @entity {
   # creation stats
   createdAtTimestamp: BigInt!
   createdAtBlockNumber: BigInt!
-
 }
 
 type Pair @entity {
@@ -157,7 +154,8 @@ type Pair @entity {
   # derived fields
   pairHourData: [PairHourData!]! @derivedFrom(field: "pair")
   liquidityPositions: [LiquidityPosition!]! @derivedFrom(field: "pair")
-  liquidityPositionSnapshots: [LiquidityPositionSnapshot!]! @derivedFrom(field: "pair")
+  liquidityPositionSnapshots: [LiquidityPositionSnapshot!]!
+    @derivedFrom(field: "pair")
   mints: [Mint!]! @derivedFrom(field: "pair")
   burns: [Burn!]! @derivedFrom(field: "pair")
   swaps: [Swap!]! @derivedFrom(field: "pair")
