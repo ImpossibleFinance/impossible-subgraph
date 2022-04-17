@@ -3,12 +3,12 @@ schema:
   file: schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: StableXFactory
+    name: ImpossibleSwapFactory
     network: bsc
     source:
       address: "0x4233Ad9B8B7C1CCf0818907908A7f0796A3dF85F"
-      abi: StableXFactory
-      startBlock: 9885000
+      abi: ImpossibleSwapFactory
+      startBlock: 14000000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -20,20 +20,20 @@ dataSources:
         - Bundle
       abis:
         - name: ERC20
-          file: StableXFactory/abis/IERC20.json
-        - name: StableXFactory
-          file: StableXFactory/abis/StableXFactory.json
+          file: ImpossibleSwapFactory/abis/IERC20.json
+        - name: ImpossibleSwapFactory
+          file: ImpossibleSwapFactory/abis/ImpossibleSwapFactory.json
       eventHandlers:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
-      file: StableXFactory/StableXFactory.wasm
+      file: ImpossibleSwapFactory/ImpossibleSwapFactory.wasm
   - kind: ethereum/contract
     name: BUSD_WBNB_PAIR
     network: bsc
     source:
       address: "0x58f876857a02d6762e0101bb5c46a8c1ed44dc16"
       abi: BUSD_WBNB_PAIR
-      startBlock: 9885000
+      startBlock: 14000000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -51,8 +51,8 @@ dataSources:
           file: BUSD_WBNB_PAIR/abis/BUSD_WBNB_PAIR.json
         - name: PancakeFactory
           file: BUSD_WBNB_PAIR/abis/PancakeFactory.json
-        - name: StableXFactory
-          file: BUSD_WBNB_PAIR/abis/StableXFactory.json
+        - name: ImpossibleSwapFactory
+          file: BUSD_WBNB_PAIR/abis/ImpossibleSwapFactory.json
       eventHandlers:
         - event: Sync(uint112,uint112)
           handler: handleSync
@@ -62,7 +62,7 @@ dataSources:
     source:
       address: "0x16b9a82891338f9ba80e2d6970fdda79d1eb0dae"
       abi: USDT_WBNB_PAIR
-      startBlock: 9885000
+      startBlock: 14000000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -80,8 +80,8 @@ dataSources:
           file: USDT_WBNB_PAIR/abis/USDT_WBNB_PAIR.json
         - name: PancakeFactory
           file: USDT_WBNB_PAIR/abis/PancakeFactory.json
-        - name: StableXFactory
-          file: USDT_WBNB_PAIR/abis/StableXFactory.json
+        - name: ImpossibleSwapFactory
+          file: USDT_WBNB_PAIR/abis/ImpossibleSwapFactory.json
       eventHandlers:
         - event: Sync(uint112,uint112)
           handler: handleSync
@@ -117,8 +117,8 @@ templates:
           file: ImpossiblePair/abis/IERC20.json
         - name: Pair
           file: ImpossiblePair/abis/Pair.json
-        - name: StableXFactory
-          file: ImpossiblePair/abis/StableXFactory.json
+        - name: ImpossibleSwapFactory
+          file: ImpossiblePair/abis/ImpossibleSwapFactory.json
       eventHandlers:
         - event: Mint(indexed address,uint256,uint256)
           handler: handleMint

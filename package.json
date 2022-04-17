@@ -4,10 +4,10 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --product hosted-service amanraj1608/ifv3",
-    "create-local": "graph create --node http://localhost:8020/ amanraj1608/ifv3",
-    "remove-local": "graph remove --node http://localhost:8020/ amanraj1608/ifv3",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 amanraj1608/ifv3"
+    "deploy": "graph deploy --product hosted-service amanraj1608/Ifv3fast",
+    "create-local": "graph create --node http://localhost:8020/ amanraj1608/Ifv3fast",
+    "remove-local": "graph remove --node http://localhost:8020/ amanraj1608/Ifv3fast",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 amanraj1608/Ifv3fast"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.21.1",
