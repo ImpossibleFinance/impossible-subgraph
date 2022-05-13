@@ -4,7 +4,7 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "prepare:bsc": "mustache schema_config/bsc.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:bsc": "mustache subgraph_config/bsc.json subgraph.template.yaml > subgraph.yaml",
     "prepare:bsc_constant": "mustache src/deployed_chain_config/bsc/bsc_constants.json src/deployed_chain_config/bsc/bsc_constants.template.ts > src/mappings/network_constants.ts",
     "deploy": "graph deploy --product hosted-service masterbid/impossible-finance-v3",
     "create-local": "graph create --node http://localhost:8020/ masterbid/impossible-finance-v3",
