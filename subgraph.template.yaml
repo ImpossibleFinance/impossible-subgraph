@@ -1,0 +1,56 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: ImpossibleSwapFactory
+    network: {{network}}
+    source:
+      address: "{{factory_address}}"
+      abi: ImpossibleSwapFactory
+      startBlock: {{start_block}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: ImpossibleSwapFactory
+          file: ./abis/impossible_swap_factory.json
+      eventHandlers:
+        - event: PairCreated(indexed address,indexed address,address,uint256)
+          handler: handlePairCreated
+      file: ./src/mappings/impossible_factory.ts
+
+templates:
+  - kind: ethereum/contract
+    name: ImpossiblePair
+    network: {{network}}
+    source:
+      abi: Pair
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/impossible_pair.ts
+      entities: []
+      abis:
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Pair
+          file: ./abis/Pair.json
+        - name: ImpossibleSwapFactory
+          file: ./abis/impossible_swap_factory.json
+      eventHandlers:
+        - event: Mint(indexed address,uint256,uint256)
+          handler: handleMint
+        - event: Burn(indexed address,uint256,uint256,indexed address)
+          handler: handleBurn
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Sync(uint256,uint256)
+          handler: handleSync
