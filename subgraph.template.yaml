@@ -52,5 +52,5 @@ templates:
           handler: handleSwap
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
-        - event: Sync(uint112,uint112)
+        - event: Sync(uint256,uint256)
           handler: handleSync
