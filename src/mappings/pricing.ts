@@ -1,79 +1,92 @@
 /* eslint-disable prefer-const */
-import { PancakeswapPair, Pair, Token, Bundle } from '../../generated/schema'
-import { BigDecimal, Address, BigInt } from '@graphprotocol/graph-ts/index'
-import { ZERO_BD, factoryContract, ADDRESS_ZERO, ONE_BD } from './common'
+import { Pair, Token } from "../../generated/schema";
+import { BigDecimal } from "@graphprotocol/graph-ts/index";
+import {
+  DAI_NATIVE_TOKEN_PAIR,
+  NATIVE_TOKEN_ADDRESS,
+  USDC_NATIVE_TOKEN_PAIR,
+  USDT_NATIVE_TOKEN_PAIR,
+  WHITELIST,
+} from "./network_constants";
+import { ONE_BD, TOTAL_NUMBER_OF_TOKENS, ZERO_BD } from "./general_constants";
+import { factoryContract, getBundle, isEqualToZeroAddress, stringToAddress } from "./common";
+import { getPair, pairNotFound } from "../helpers/pair";
 
-let WBNB_ADDRESS = '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c'
-export let BUSD_WBNB_PAIR = '0x58f876857a02d6762e0101bb5c46a8c1ed44dc16' // created block 589414
-export let USDT_WBNB_PAIR = '0x16b9a82891338f9ba80e2d6970fdda79d1eb0dae' // created block 648115
+export function getNativeTokenPriceInUSD(): BigDecimal {
+  let usdtPair = getPair(stringToAddress(USDT_NATIVE_TOKEN_PAIR)); // usdt is token0
+  let usdcPair = getPair(stringToAddress(USDC_NATIVE_TOKEN_PAIR)); // usdc is token0
+  let daiPair = getPair(stringToAddress(DAI_NATIVE_TOKEN_PAIR)); // dai is token0
 
-export function getBnbPriceInUSD(): BigDecimal {
-  // fetch eth prices for each stablecoin
-  let usdtPair = PancakeswapPair.load(Address.fromString(USDT_WBNB_PAIR).toHexString()) // usdt is token0
-  let busdPair = PancakeswapPair.load(Address.fromString(BUSD_WBNB_PAIR).toHexString()) // busd is token1
-
-  if (busdPair !== null && usdtPair !== null) {
-    let totalLiquidityBNB = busdPair.reserve0.plus(usdtPair.reserve1)
-    if (totalLiquidityBNB.notEqual(ZERO_BD)) {
-      let busdWeight = busdPair.reserve0.div(totalLiquidityBNB)
-      let usdtWeight = usdtPair.reserve1.div(totalLiquidityBNB)
-      return busdPair.token1Price.times(busdWeight).plus(usdtPair.token0Price.times(usdtWeight))
-    } else {
-      return ZERO_BD
-    }
-  } else if (busdPair !== null) {
-    return busdPair.token1Price
-  } else if (usdtPair !== null) {
-    return usdtPair.token0Price
-  } else {
-    return ZERO_BD
+  // USDC/USDT/DAI pairs found
+  if (usdcUsdtDaiExist(usdtPair, usdcPair, daiPair)) {
+    return setPriceWithUsdtUsdcDaiPairs(usdtPair, usdcPair, daiPair);
   }
+
+  // Only USDC/USDT pair found
+  if (onlyUsdcUsdtExist(usdtPair, usdcPair, daiPair)) {
+    return setPriceWithUsdtUsdcPairsOnly(usdtPair, usdcPair);
+  }
+
+  // Only USDT/DAI pair found
+  if (onlyUsdtDaiExist(usdtPair, usdcPair, daiPair)) {
+    return setPriceWithUsdtDaiPairsOnly(usdtPair, daiPair);
+  }
+
+  // Only USDC/DAI pair found
+  if (onlyUsdcDaiExist(usdtPair, usdcPair, daiPair)) {
+    return setPriceWithUsdcDaiPairsOnly(usdcPair, daiPair);
+  }
+
+  // Only USDC pair found
+  if (onlyUsdcExist(usdtPair, usdcPair, daiPair)) {
+    return usdcPair.token0Price;
+  }
+
+  // Only USDT pair found
+  if (onlyUsdtExist(usdtPair, usdcPair, daiPair)) {
+    return usdtPair.token0Price;
+  }
+
+  // Only DAI pair found
+  if (onlyDaiExist(usdtPair, usdcPair, daiPair)) {
+    return daiPair.token0Price;
+  }
+
+  // No pair found
+  return ZERO_BD;
 }
-
-// token where amounts should contribute to tracked volume and liquidity
-let WHITELIST: string[] = [
-  '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c', // WBNB
-  '0xb0e1fc65c1a741b4662b813eb787d369b8614af1', // IF
-  '0x0b15ddf19d47e6a86a56148fb4afffc6929bcb89', // IDIA
-  '0xb32ac3c79a94ac1eb258f3c830bbdbc676483c93', // OPENSWAP
-  '0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3', // DAI
-  '0x0da6ed8b13214ff28e9ca979dd37439e8a88f6c4', // STABLEX
-  '0xa0a9961b7477d1a530f06a1ee805d5e532e73d97', // Ariadne
-  '0xe9e7cea3dedca5984780bafc599bd69add087d56', // BUSD
-  '0x55d398326f99059ff775485246999027b3197955', // USDT
-  '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d', // USDC
-  '0x23396cf899ca06c4472205fc903bdb4de249d6fc', // UST
-  '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c', // BTCB
-  '0x2170ed0880ac9a755fd29b2688956bd959f933f8' // WETH
-]
-
-// minimum liquidity for price to get tracked
-// let MINIMUM_LIQUIDITY_THRESHOLD_BNB = BigDecimal.fromString('10')
 
 /**
  * Search through graph to find derived BNB per token.
  * @todo update to be derived BNB (add stablecoin estimates)
  **/
-export function findBnbPerToken(token: Token): BigDecimal {
-  if (token.id == Address.fromString(WBNB_ADDRESS).toHexString()) {
-    return ONE_BD
+export function getTokenPriceInNativeToken(token: Token): BigDecimal {
+  if (token.id == stringToAddress(NATIVE_TOKEN_ADDRESS).toHexString()) {
+    return ONE_BD;
   }
   // loop through whitelist and check if paired with any
   for (let i = 0; i < WHITELIST.length; ++i) {
-    let pairAddress = factoryContract.getPair(Address.fromString(token.id), Address.fromString(WHITELIST[i]))
-    if (pairAddress.toHex() != ADDRESS_ZERO) {
-      let pair = Pair.load(pairAddress.toHexString())
-      if (pair.token0 == token.id) {
-        let token1 = Token.load(pair.token1)
-        return pair.token1Price.times(token1.derivedBNB as BigDecimal) // return token1 per our token * BNB per token 1
-      }
-      if (pair.token1 == token.id) {
-        let token0 = Token.load(pair.token0)
-        return pair.token0Price.times(token0.derivedBNB as BigDecimal) // return token0 per our token * BNB per token 0
-      }
+    let pairAddress = factoryContract.getPair(stringToAddress(token.id), stringToAddress(WHITELIST[i]));
+    if (isEqualToZeroAddress(pairAddress)) {
+      return ZERO_BD;
+    }
+
+    let pair = getPair(pairAddress);
+    if (pairNotFound(pair)) {
+      return ZERO_BD;
+    }
+
+    if (pair.token0 == token.id) {
+      let token1 = Token.load(pair.token1)!;
+      return pair.token1Price.times(token1.derivedBNB as BigDecimal); // return token1 per our token * BNB per token 1
+    }
+
+    if (pair.token1 == token.id) {
+      let token0 = Token.load(pair.token0)!;
+      return pair.token0Price.times(token0.derivedBNB as BigDecimal); // return token0 per our token * BNB per token 0
     }
   }
-  return ZERO_BD // nothing was found return 0
+  return ZERO_BD;
 }
 
 /**
@@ -86,33 +99,32 @@ export function getTrackedVolumeUSD(
   tokenAmount0: BigDecimal,
   token0: Token,
   tokenAmount1: BigDecimal,
-  token1: Token
+  token1: Token,
 ): BigDecimal {
-  let bundle = Bundle.load('1')
-  let price0 = token0.derivedBNB.times(bundle.bnbPrice)
-  let price1 = token1.derivedBNB.times(bundle.bnbPrice)
-
+  let bundle = getBundle();
+  let price0 = token0.derivedBNB.times(bundle.bnbPrice);
+  let price1 = token1.derivedBNB.times(bundle.bnbPrice);
 
   // both are whitelist tokens, take average of both amounts
-  if (WHITELIST.includes(token0.id) && WHITELIST.includes(token1.id)) {
+  if (bothTokensAreWhitelisted(token0, token1)) {
     return tokenAmount0
       .times(price0)
       .plus(tokenAmount1.times(price1))
-      .div(BigDecimal.fromString('2'))
+      .div(BigDecimal.fromString(TOTAL_NUMBER_OF_TOKENS));
   }
 
   // take full value of the whitelisted token amount
-  if (WHITELIST.includes(token0.id) && !WHITELIST.includes(token1.id)) {
-    return tokenAmount0.times(price0)
+  if (onlyFirstTokenIsWhitelisted(token0, token1)) {
+    return tokenAmount0.times(price0);
   }
 
   // take full value of the whitelisted token amount
-  if (!WHITELIST.includes(token0.id) && WHITELIST.includes(token1.id)) {
-    return tokenAmount1.times(price1)
+  if (onlySecondTokenIsWhitelisted(token0, token1)) {
+    return tokenAmount1.times(price1);
   }
 
   // neither token is on white list, tracked volume is 0
-  return ZERO_BD
+  return ZERO_BD;
 }
 
 /**
@@ -125,27 +137,142 @@ export function getTrackedLiquidityUSD(
   tokenAmount0: BigDecimal,
   token0: Token,
   tokenAmount1: BigDecimal,
-  token1: Token
+  token1: Token,
 ): BigDecimal {
-  let bundle = Bundle.load('1')
-  let price0 = token0.derivedBNB.times(bundle.bnbPrice)
-  let price1 = token1.derivedBNB.times(bundle.bnbPrice)
+  let bundle = getBundle();
+  let price0 = token0.derivedBNB.times(bundle.bnbPrice);
+  let price1 = token1.derivedBNB.times(bundle.bnbPrice);
 
   // both are whitelist tokens, take average of both amounts
-  if (WHITELIST.includes(token0.id) && WHITELIST.includes(token1.id)) {
-    return tokenAmount0.times(price0).plus(tokenAmount1.times(price1))
+  if (bothTokensAreWhitelisted(token0, token1)) {
+    return tokenAmount0.times(price0).plus(tokenAmount1.times(price1));
   }
 
   // take double value of the whitelisted token amount
-  if (WHITELIST.includes(token0.id) && !WHITELIST.includes(token1.id)) {
-    return tokenAmount0.times(price0).times(BigDecimal.fromString('2'))
+  if (onlyFirstTokenIsWhitelisted(token0, token1)) {
+    return tokenAmount0.times(price0).times(BigDecimal.fromString(TOTAL_NUMBER_OF_TOKENS));
   }
 
   // take double value of the whitelisted token amount
-  if (!WHITELIST.includes(token0.id) && WHITELIST.includes(token1.id)) {
-    return tokenAmount1.times(price1).times(BigDecimal.fromString('2'))
+  if (onlySecondTokenIsWhitelisted(token0, token1)) {
+    return tokenAmount1.times(price1).times(BigDecimal.fromString(TOTAL_NUMBER_OF_TOKENS));
   }
 
   // neither token is on white list, tracked volume is 0
-  return ZERO_BD
+  return ZERO_BD;
+}
+
+function setPriceWithUsdtUsdcDaiPairs(usdtPair: Pair, usdcPair: Pair, daiPair: Pair): BigDecimal {
+  let totalLiquidityBNB = usdcPair.reserve1.plus(usdtPair.reserve1).plus(daiPair.reserve1);
+  if (totalLiquidityBNB.equals(ZERO_BD)) {
+    return ZERO_BD;
+  }
+
+  let usdcWeight = usdcPair.reserve1.div(totalLiquidityBNB);
+  let usdtWeight = usdtPair.reserve1.div(totalLiquidityBNB);
+  let daiWeight = daiPair.reserve1.div(totalLiquidityBNB);
+  return usdcPair.token0Price
+    .times(usdcWeight)
+    .plus(usdtPair.token0Price.times(usdtWeight))
+    .plus(daiPair.token0Price.times(daiWeight));
+}
+
+function setPriceWithUsdtUsdcPairsOnly(usdtPair: Pair, usdcPair: Pair): BigDecimal {
+  let totalLiquidityBNB = usdcPair.reserve1.plus(usdtPair.reserve1);
+  if (totalLiquidityBNB.equals(ZERO_BD)) {
+    return ZERO_BD;
+  }
+  let usdcWeight = usdcPair.reserve1.div(totalLiquidityBNB);
+  let usdtWeight = usdtPair.reserve1.div(totalLiquidityBNB);
+  return usdcPair.token0Price.times(usdcWeight).plus(usdtPair.token0Price.times(usdtWeight));
+}
+
+function setPriceWithUsdtDaiPairsOnly(usdtPair: Pair, daiPair: Pair): BigDecimal {
+  let totalLiquidityBNB = usdtPair.reserve1.plus(daiPair.reserve1);
+  if (totalLiquidityBNB.equals(ZERO_BD)) {
+    return ZERO_BD;
+  }
+  let usdtWeight = usdtPair.reserve1.div(totalLiquidityBNB);
+  let daiWeight = daiPair.reserve1.div(totalLiquidityBNB);
+  return usdtPair.token0Price.times(usdtWeight).plus(daiPair.token0Price.times(daiWeight));
+}
+
+function setPriceWithUsdcDaiPairsOnly(usdcPair: Pair, daiPair: Pair): BigDecimal {
+  let totalLiquidityBNB = usdcPair.reserve1.plus(daiPair.reserve1);
+  if (totalLiquidityBNB.equals(ZERO_BD)) {
+    return ZERO_BD;
+  }
+  let usdcWeight = usdcPair.reserve1.div(totalLiquidityBNB);
+  let daiWeight = daiPair.reserve1.div(totalLiquidityBNB);
+  return usdcPair.token0Price.times(usdcWeight).plus(daiPair.token0Price.times(daiWeight));
+}
+
+function usdcUsdtDaiExist(usdtPair: Pair, usdcPair: Pair, daiPair: Pair): boolean {
+  if (pairNotFound(usdcPair) && pairNotFound(usdtPair) && pairNotFound(daiPair)) {
+    return false;
+  }
+  return true;
+}
+
+function onlyUsdcUsdtExist(usdtPair: Pair, usdcPair: Pair, daiPair: Pair): boolean {
+  if (!pairNotFound(usdcPair) && !pairNotFound(usdtPair) && pairNotFound(daiPair)) {
+    return true;
+  }
+  return false;
+}
+
+function onlyUsdcDaiExist(usdtPair: Pair, usdcPair: Pair, daiPair: Pair): boolean {
+  if (!pairNotFound(usdcPair) && !pairNotFound(daiPair) && pairNotFound(usdtPair)) {
+    return true;
+  }
+  return false;
+}
+
+function onlyUsdtDaiExist(usdtPair: Pair, usdcPair: Pair, daiPair: Pair): boolean {
+  if (!pairNotFound(usdtPair) && !pairNotFound(daiPair) && pairNotFound(usdcPair)) {
+    return true;
+  }
+  return false;
+}
+
+function onlyUsdtExist(usdtPair: Pair, usdcPair: Pair, daiPair: Pair): boolean {
+  if (!pairNotFound(usdtPair) && pairNotFound(usdcPair) && pairNotFound(daiPair)) {
+    return true;
+  }
+  return false;
+}
+
+function onlyUsdcExist(usdtPair: Pair, usdcPair: Pair, daiPair: Pair): boolean {
+  if (!pairNotFound(usdcPair) && pairNotFound(usdtPair) && pairNotFound(daiPair)) {
+    return true;
+  }
+  return false;
+}
+
+function onlyDaiExist(usdtPair: Pair, usdcPair: Pair, daiPair: Pair): boolean {
+  if (!pairNotFound(daiPair) && pairNotFound(usdcPair) && pairNotFound(usdtPair)) {
+    return true;
+  }
+  return false;
+}
+
+function bothTokensAreWhitelisted(token0: Token, token1: Token): boolean {
+  if (WHITELIST.includes(token0.id) && WHITELIST.includes(token1.id)) {
+    return true;
+  }
+  return false;
+}
+
+function onlyFirstTokenIsWhitelisted(token0: Token, token1: Token): boolean {
+  if (WHITELIST.includes(token0.id) && !WHITELIST.includes(token1.id)) {
+    return true;
+  }
+  return false;
+}
+
+function onlySecondTokenIsWhitelisted(token0: Token, token1: Token): boolean {
+  if (!WHITELIST.includes(token0.id) && WHITELIST.includes(token1.id)) {
+    return true;
+  }
+  return false;
 }
