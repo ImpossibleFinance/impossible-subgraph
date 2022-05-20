@@ -1,90 +1,51 @@
-type PancakeswapFactory @entity {
-  # factory address
-  id: ID!
-
-  # pair info
-  pairCount: Int!
-
-  # total volume
-  totalVolumeUSD: BigDecimal!
-  totalVolumeBNB: BigDecimal!
-  untrackedVolumeUSD: BigDecimal!
-
-  # total liquidity
-  totalLiquidityUSD: BigDecimal!
-  totalLiquidityBNB: BigDecimal!
-
-  # transactions
-  txCount: BigInt!
-}
-
-# Impossible factory
+" Impossible factory"
 type Factory @entity {
-  # factory address
+  " factory address"
   id: ID!
 
-  # pair info
+  " pair info"
   pairCount: Int!
 
-  # total volume
+  " total volume"
   totalVolumeUSD: BigDecimal!
   totalVolumeBNB: BigDecimal!
   untrackedVolumeUSD: BigDecimal!
 
-  # total liquidity
+  " total liquidity"
   totalLiquidityUSD: BigDecimal!
   totalLiquidityBNB: BigDecimal!
 
-  # transactions
-  txCount: BigInt!
-}
-
-type PancakeswapToken @entity {
-  # token address
-  id: ID!
-
-  # mirrored from the smart contract
-  symbol: String!
-  name: String!
-  decimals: BigInt!
-
-  # used for other stats like marketcap
-  totalSupply: BigInt!
-
-  # token specific volume
-  tradeVolume: BigDecimal!
-  tradeVolumeUSD: BigDecimal!
-  untrackedVolumeUSD: BigDecimal!
-  # transactions across all pairs
+  " transactions"
   txCount: BigInt!
 }
 
 type Token @entity {
-  # token address
+  " token address"
   id: ID!
 
-  # mirrored from the smart contract
+  " mirrored from the smart contract"
   symbol: String!
   name: String!
   decimals: BigInt!
 
-  # used for other stats like marketcap
+  " used for other stats like marketcap"
   totalSupply: BigInt!
 
-  # token specific volume
+  " token specific volume"
   tradeVolume: BigDecimal!
   tradeVolumeUSD: BigDecimal!
   untrackedVolumeUSD: BigDecimal!
-  # transactions across all pairs
+
+  " transactions across all pairs"
   txCount: BigInt!
 
-  # liquidity across all pairs
+  " liquidity across all pairs"
   totalLiquidity: BigDecimal!
 
-  # derived prices
-  derivedBNB: BigDecimal
+  " derived prices"
+  derivedBNB: BigDecimal!
 
-  # derived fields
+  " derived fields"
   tokenDayData: [TokenDayData!]! @derivedFrom(field: "token")
   pairDayDataBase: [PairDayData!]! @derivedFrom(field: "token0")
   pairDayDataQuote: [PairDayData!]! @derivedFrom(field: "token1")
@@ -92,66 +53,41 @@ type Token @entity {
   pairQuote: [Pair!]! @derivedFrom(field: "token1")
 }
 
-type PancakeswapPair @entity {
-  # pair address
-  id: ID!
-
-  # mirrored from the smart contract
-  token0: Token!
-  token1: Token!
-  reserve0: BigDecimal!
-  reserve1: BigDecimal!
-  totalSupply: BigDecimal!
-
-  # Price in terms of the asset pair
-  token0Price: BigDecimal!
-  token1Price: BigDecimal!
-
-  # lifetime volume stats
-  volumeToken0: BigDecimal!
-  volumeToken1: BigDecimal!
-  volumeUSD: BigDecimal!
-  txCount: BigInt!
-  untrackedVolumeUSD: BigDecimal!
-
-  # creation stats
-  createdAtTimestamp: BigInt!
-  createdAtBlockNumber: BigInt!
-}
-
 type Pair @entity {
-  # pair address
+  " pair address"
   id: ID!
 
-  # mirrored from the smart contract
+  " mirrored from the smart contract"
   token0: Token!
   token1: Token!
   reserve0: BigDecimal!
   reserve1: BigDecimal!
   totalSupply: BigDecimal!
 
-  # derived liquidity
+  " derived liquidity"
   reserveBNB: BigDecimal!
   reserveUSD: BigDecimal!
-  # Price in terms of the asset pair
+
+  " Price in terms of the asset pair"
   token0Price: BigDecimal!
   token1Price: BigDecimal!
   trackedReserveBNB: BigDecimal!
 
-  # lifetime volume stats
+  " lifetime volume stats"
   volumeToken0: BigDecimal!
   volumeToken1: BigDecimal!
   volumeUSD: BigDecimal!
   txCount: BigInt!
   untrackedVolumeUSD: BigDecimal!
 
-  # creation stats
+  " creation stats"
   createdAtTimestamp: BigInt!
   createdAtBlockNumber: BigInt!
 
-  # Fields used to help derived relationship
+  " Fields used to help derived relationship"
   liquidityProviderCount: BigInt! # used to detect new exchanges
-  # derived fields
+
+  " derived fields"
   pairHourData: [PairHourData!]! @derivedFrom(field: "pair")
   liquidityPositions: [LiquidityPosition!]! @derivedFrom(field: "pair")
   liquidityPositionSnapshots: [LiquidityPositionSnapshot!]!
@@ -174,7 +110,7 @@ type LiquidityPosition @entity {
   liquidityTokenBalance: BigDecimal!
 }
 
-# saved over time for return calculations, gets created and never updated
+" saved over time for return calculations, gets created and never updated"
 type LiquidityPositionSnapshot @entity {
   id: ID!
   liquidityPosition: LiquidityPosition!
@@ -197,70 +133,68 @@ type Transaction @entity {
   timestamp: BigInt!
   # This is not the reverse of Mint.transaction; it is only used to
   # track incomplete mints (similar for burns and swaps)
-  mints: [Mint]!
-  burns: [Burn]!
-  swaps: [Swap]!
+  mints: [Mint!]!
+  burns: [Burn!]!
+  swaps: [Swap!]!
 }
 
 type Mint @entity {
-  # transaction hash + "-" + index in mints Transaction array
-  id: ID!
+  id: ID! # transaction hash + "-" + index in mints Transaction array
   transaction: Transaction!
   timestamp: BigInt! # need this to pull recent txns for specific token or pair
   pair: Pair!
 
-  # populated from the primary Transfer event
+  " populated from the primary Transfer event"
   to: Bytes!
   liquidity: BigDecimal!
 
-  # populated from the Mint event
+  " populated from the Mint event"
   sender: Bytes
   amount0: BigDecimal
   amount1: BigDecimal
   logIndex: BigInt
-  # derived amount based on available prices of tokens
+
+  " derived amount based on available prices of tokens"
   amountUSD: BigDecimal
 
-  # optional fee fields, if a Transfer event is fired in _mintFee
+  " optional fee fields, if a Transfer event is fired in _mintFee"
   feeTo: Bytes
   feeLiquidity: BigDecimal
 }
 
 type Burn @entity {
-  # transaction hash + "-" + index in mints Transaction array
-  id: ID!
+  id: ID! # transaction hash + "-" + index in mints Transaction array
   transaction: Transaction!
   timestamp: BigInt! # need this to pull recent txns for specific token or pair
   pair: Pair!
 
-  # populated from the primary Transfer event
+  " populated from the primary Transfer event"
   liquidity: BigDecimal!
 
-  # populated from the Burn event
-  sender: Bytes
+  " populated from the Burn event"
+  sender: Bytes!
   amount0: BigDecimal
   amount1: BigDecimal
   to: Bytes
   logIndex: BigInt
-  # derived amount based on available prices of tokens
+  " derived amount based on available prices of tokens"
   amountUSD: BigDecimal
 
-  # mark uncomplete in BNB case
+  " mark uncomplete in BNB case"
   needsComplete: Boolean!
 
-  # optional fee fields, if a Transfer event is fired in _mintFee
+  " optional fee fields, if a Transfer event is fired in _mintFee"
   feeTo: Bytes
   feeLiquidity: BigDecimal
 }
 
 type Swap @entity {
-  # transaction hash + "-" + index in swaps Transaction array
-  id: ID!
+  id: ID! # transaction hash + "-" + index in swaps Transaction array
   transaction: Transaction!
   timestamp: BigInt! # need this to pull recent txns for specific token or pair
   pair: Pair!
 
-  # populated from the Swap event
+  " populated from the Swap event"
   sender: Bytes!
   amount0In: BigDecimal!
   amount1In: BigDecimal!
@@ -269,17 +203,17 @@ type Swap @entity {
   to: Bytes!
   logIndex: BigInt
 
-  # derived info
+  " derived info"
   amountUSD: BigDecimal!
 }
 
-# stores for USD calculations
+" stores for USD calculations"
 type Bundle @entity {
   id: ID!
   bnbPrice: BigDecimal! # price of BNB usd
 }
 
-# Data accumulated and condensed into day stats for all of Uniswap
+" Data accumulated and condensed into day stats for all of Uniswap"
 type ImpossibleDayData @entity {
   id: ID! # timestamp rounded to current day by dividing by 86400
   date: Int!
@@ -301,22 +235,22 @@ type PairHourData @entity {
   hourStartUnix: Int! # unix timestamp for start of hour
   pair: Pair!
 
-  # reserves
+  " reserves"
   reserve0: BigDecimal!
   reserve1: BigDecimal!
 
-  # derived liquidity
+  " derived liquidity"
   reserveUSD: BigDecimal!
   totalSupply: BigDecimal!
 
-  # volume stats
+  " volume stats"
   hourlyVolumeToken0: BigDecimal!
   hourlyVolumeToken1: BigDecimal!
   hourlyVolumeUSD: BigDecimal!
   hourlyTxns: BigInt!
 }
 
-# Data accumulated and condensed into day stats for each exchange
+" Data accumulated and condensed into day stats for each exchange"
 type PairDayData @entity {
   id: ID!
   date: Int!
@@ -324,17 +258,17 @@ type PairDayData @entity {
   token0: Token!
   token1: Token!
 
-  # reserves
+  " reserves"
   reserve0: BigDecimal!
   reserve1: BigDecimal!
 
-  # total supply for LP historical returns
+  " total supply for LP historical returns"
   totalSupply: BigDecimal!
 
-  # derived liquidity
+  " derived liquidity"
   reserveUSD: BigDecimal!
 
-  # volume stats
+  " volume stats"
   dailyVolumeToken0: BigDecimal!
   dailyVolumeToken1: BigDecimal!
   dailyVolumeUSD: BigDecimal!
@@ -346,34 +280,18 @@ type TokenDayData @entity {
   date: Int!
   token: Token!
 
-  # volume stats
+  " volume stats"
   dailyVolumeToken: BigDecimal!
   dailyVolumeBNB: BigDecimal!
   dailyVolumeUSD: BigDecimal!
   dailyTxns: BigInt!
 
-  # liquidity stats
+  " liquidity stats"
   totalLiquidityToken: BigDecimal!
   totalLiquidityBNB: BigDecimal!
   totalLiquidityUSD: BigDecimal!
 
-  # price stats
+  " price stats"
   priceUSD: BigDecimal!
 }
 
-type Block @entity {
-  id: ID!
-  number: BigInt!
-  timestamp: BigInt!
-  parentHash: String
-  author: String
-  difficulty: BigInt
-  totalDifficulty: BigInt
-  gasUsed: BigInt
-  gasLimit: BigInt
-  receiptsRoot: String
-  transactionsRoot: String
-  stateRoot: String
-  size: BigInt
-  unclesHash: String
-}

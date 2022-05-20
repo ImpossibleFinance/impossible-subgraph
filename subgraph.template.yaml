@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: ImpossibleSwapFactory
-    network: bsc
+    network: {{network}}
     source:
-      address: "0x4233Ad9B8B7C1CCf0818907908A7f0796A3dF85F"
+      address: "{{factory_address}}"
       abi: ImpossibleSwapFactory
-      startBlock: 13494351
+      startBlock: {{start_block}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -27,7 +27,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: ImpossiblePair
-    network: bsc
+    network: {{network}}
     source:
       abi: Pair
     mapping:

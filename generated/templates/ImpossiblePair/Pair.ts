@@ -66,6 +66,32 @@ export class Burn__Params {
   }
 }
 
+export class ChangeInvariant extends ethereum.Event {
+  get params(): ChangeInvariant__Params {
+    return new ChangeInvariant__Params(this);
+  }
+}
+
+export class ChangeInvariant__Params {
+  _event: ChangeInvariant;
+
+  constructor(event: ChangeInvariant) {
+    this._event = event;
+  }
+
+  get _isXybk(): boolean {
+    return this._event.parameters[0].value.toBoolean();
+  }
+
+  get _newBoost0(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
+  }
+
+  get _newBoost1(): BigInt {
+    return this._event.parameters[2].value.toBigInt();
+  }
+}
+
 export class Mint extends ethereum.Event {
   get params(): Mint__Params {
     return new Mint__Params(this);
@@ -178,6 +204,128 @@ export class Transfer__Params {
   }
 }
 
+export class UpdatedBoost extends ethereum.Event {
+  get params(): UpdatedBoost__Params {
+    return new UpdatedBoost__Params(this);
+  }
+}
+
+export class UpdatedBoost__Params {
+  _event: UpdatedBoost;
+
+  constructor(event: UpdatedBoost) {
+    this._event = event;
+  }
+
+  get _oldBoost0(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+
+  get _oldBoost1(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
+  }
+
+  get _newBoost0(): BigInt {
+    return this._event.parameters[2].value.toBigInt();
+  }
+
+  get _newBoost1(): BigInt {
+    return this._event.parameters[3].value.toBigInt();
+  }
+
+  get _start(): BigInt {
+    return this._event.parameters[4].value.toBigInt();
+  }
+
+  get _end(): BigInt {
+    return this._event.parameters[5].value.toBigInt();
+  }
+}
+
+export class UpdatedDelay extends ethereum.Event {
+  get params(): UpdatedDelay__Params {
+    return new UpdatedDelay__Params(this);
+  }
+}
+
+export class UpdatedDelay__Params {
+  _event: UpdatedDelay;
+
+  constructor(event: UpdatedDelay) {
+    this._event = event;
+  }
+
+  get _oldDelay(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+
+  get _newDelay(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
+  }
+}
+
+export class UpdatedTradeFees extends ethereum.Event {
+  get params(): UpdatedTradeFees__Params {
+    return new UpdatedTradeFees__Params(this);
+  }
+}
+
+export class UpdatedTradeFees__Params {
+  _event: UpdatedTradeFees;
+
+  constructor(event: UpdatedTradeFees) {
+    this._event = event;
+  }
+
+  get _oldFee(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+
+  get _newFee(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
+  }
+}
+
+export class UpdatedTradeState extends ethereum.Event {
+  get params(): UpdatedTradeState__Params {
+    return new UpdatedTradeState__Params(this);
+  }
+}
+
+export class UpdatedTradeState__Params {
+  _event: UpdatedTradeState;
+
+  constructor(event: UpdatedTradeState) {
+    this._event = event;
+  }
+
+  get _tradeState(): i32 {
+    return this._event.parameters[0].value.toI32();
+  }
+}
+
+export class UpdatedWithdrawalFeeRatio extends ethereum.Event {
+  get params(): UpdatedWithdrawalFeeRatio__Params {
+    return new UpdatedWithdrawalFeeRatio__Params(this);
+  }
+}
+
+export class UpdatedWithdrawalFeeRatio__Params {
+  _event: UpdatedWithdrawalFeeRatio;
+
+  constructor(event: UpdatedWithdrawalFeeRatio) {
+    this._event = event;
+  }
+
+  get _oldWithdrawalFee(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+
+  get _newWithdrawalFee(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
+  }
+}
+
 export class Pair__burnResult {
   value0: BigInt;
   value1: BigInt;
@@ -195,12 +343,29 @@ export class Pair__burnResult {
   }
 }
 
-export class Pair__getReservesResult {
+export class Pair__calcBoostResult {
   value0: BigInt;
   value1: BigInt;
-  value2: BigInt;
 
-  constructor(value0: BigInt, value1: BigInt, value2: BigInt) {
+  constructor(value0: BigInt, value1: BigInt) {
+    this.value0 = value0;
+    this.value1 = value1;
+  }
+
+  toMap(): TypedMap<string, ethereum.Value> {
+    let map = new TypedMap<string, ethereum.Value>();
+    map.set("value0", ethereum.Value.fromUnsignedBigInt(this.value0));
+    map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
+    return map;
+  }
+}
+
+export class Pair__getPairSettingsResult {
+  value0: i32;
+  value1: i32;
+  value2: boolean;
+
+  constructor(value0: i32, value1: i32, value2: boolean) {
     this.value0 = value0;
     this.value1 = value1;
     this.value2 = value2;
@@ -208,9 +373,32 @@ export class Pair__getReservesResult {
 
   toMap(): TypedMap<string, ethereum.Value> {
     let map = new TypedMap<string, ethereum.Value>();
+    map.set(
+      "value0",
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(this.value0))
+    );
+    map.set(
+      "value1",
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(this.value1))
+    );
+    map.set("value2", ethereum.Value.fromBoolean(this.value2));
+    return map;
+  }
+}
+
+export class Pair__getReservesResult {
+  value0: BigInt;
+  value1: BigInt;
+
+  constructor(value0: BigInt, value1: BigInt) {
+    this.value0 = value0;
+    this.value1 = value1;
+  }
+
+  toMap(): TypedMap<string, ethereum.Value> {
+    let map = new TypedMap<string, ethereum.Value>();
     map.set("value0", ethereum.Value.fromUnsignedBigInt(this.value0));
     map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
-    map.set("value2", ethereum.Value.fromUnsignedBigInt(this.value2));
     return map;
   }
 }
@@ -373,6 +561,30 @@ export class Pair extends ethereum.SmartContract {
     );
   }
 
+  calcBoost(): Pair__calcBoostResult {
+    let result = super.call("calcBoost", "calcBoost():(uint256,uint256)", []);
+
+    return new Pair__calcBoostResult(
+      result[0].toBigInt(),
+      result[1].toBigInt()
+    );
+  }
+
+  try_calcBoost(): ethereum.CallResult<Pair__calcBoostResult> {
+    let result = super.tryCall(
+      "calcBoost",
+      "calcBoost():(uint256,uint256)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(
+      new Pair__calcBoostResult(value[0].toBigInt(), value[1].toBigInt())
+    );
+  }
+
   decimals(): i32 {
     let result = super.call("decimals", "decimals():(uint8)", []);
 
@@ -386,6 +598,36 @@ export class Pair extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toI32());
+  }
+
+  delay(): BigInt {
+    let result = super.call("delay", "delay():(uint256)", []);
+
+    return result[0].toBigInt();
+  }
+
+  try_delay(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("delay", "delay():(uint256)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  endTime(): BigInt {
+    let result = super.call("endTime", "endTime():(uint256)", []);
+
+    return result[0].toBigInt();
+  }
+
+  try_endTime(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("endTime", "endTime():(uint256)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   factory(): Address {
@@ -403,24 +645,24 @@ export class Pair extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  getReserves(): Pair__getReservesResult {
+  getPairSettings(): Pair__getPairSettingsResult {
     let result = super.call(
-      "getReserves",
-      "getReserves():(uint112,uint112,uint32)",
+      "getPairSettings",
+      "getPairSettings():(uint16,uint8,bool)",
       []
     );
 
-    return new Pair__getReservesResult(
-      result[0].toBigInt(),
-      result[1].toBigInt(),
-      result[2].toBigInt()
+    return new Pair__getPairSettingsResult(
+      result[0].toI32(),
+      result[1].toI32(),
+      result[2].toBoolean()
     );
   }
 
-  try_getReserves(): ethereum.CallResult<Pair__getReservesResult> {
+  try_getPairSettings(): ethereum.CallResult<Pair__getPairSettingsResult> {
     let result = super.tryCall(
-      "getReserves",
-      "getReserves():(uint112,uint112,uint32)",
+      "getPairSettings",
+      "getPairSettings():(uint16,uint8,bool)",
       []
     );
     if (result.reverted) {
@@ -428,11 +670,39 @@ export class Pair extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new Pair__getReservesResult(
-        value[0].toBigInt(),
-        value[1].toBigInt(),
-        value[2].toBigInt()
+      new Pair__getPairSettingsResult(
+        value[0].toI32(),
+        value[1].toI32(),
+        value[2].toBoolean()
       )
+    );
+  }
+
+  getReserves(): Pair__getReservesResult {
+    let result = super.call(
+      "getReserves",
+      "getReserves():(uint256,uint256)",
+      []
+    );
+
+    return new Pair__getReservesResult(
+      result[0].toBigInt(),
+      result[1].toBigInt()
+    );
+  }
+
+  try_getReserves(): ethereum.CallResult<Pair__getReservesResult> {
+    let result = super.tryCall(
+      "getReserves",
+      "getReserves():(uint256,uint256)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(
+      new Pair__getReservesResult(value[0].toBigInt(), value[1].toBigInt())
     );
   }
 
@@ -504,45 +774,52 @@ export class Pair extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  price0CumulativeLast(): BigInt {
+  router(): Address {
+    let result = super.call("router", "router():(address)", []);
+
+    return result[0].toAddress();
+  }
+
+  try_router(): ethereum.CallResult<Address> {
+    let result = super.tryCall("router", "router():(address)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  routerExtension(): Address {
     let result = super.call(
-      "price0CumulativeLast",
-      "price0CumulativeLast():(uint256)",
+      "routerExtension",
+      "routerExtension():(address)",
       []
     );
 
-    return result[0].toBigInt();
+    return result[0].toAddress();
   }
 
-  try_price0CumulativeLast(): ethereum.CallResult<BigInt> {
+  try_routerExtension(): ethereum.CallResult<Address> {
     let result = super.tryCall(
-      "price0CumulativeLast",
-      "price0CumulativeLast():(uint256)",
+      "routerExtension",
+      "routerExtension():(address)",
       []
     );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
+    return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  price1CumulativeLast(): BigInt {
-    let result = super.call(
-      "price1CumulativeLast",
-      "price1CumulativeLast():(uint256)",
-      []
-    );
+  startTime(): BigInt {
+    let result = super.call("startTime", "startTime():(uint256)", []);
 
     return result[0].toBigInt();
   }
 
-  try_price1CumulativeLast(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "price1CumulativeLast",
-      "price1CumulativeLast():(uint256)",
-      []
-    );
+  try_startTime(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("startTime", "startTime():(uint256)", []);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -664,6 +941,29 @@ export class Pair extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
+  withdrawalFeeRatio(): BigInt {
+    let result = super.call(
+      "withdrawalFeeRatio",
+      "withdrawalFeeRatio():(uint256)",
+      []
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_withdrawalFeeRatio(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "withdrawalFeeRatio",
+      "withdrawalFeeRatio():(uint256)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 }
 
@@ -793,12 +1093,80 @@ export class InitializeCall__Inputs {
   get _token1(): Address {
     return this._call.inputValues[1].value.toAddress();
   }
+
+  get _router(): Address {
+    return this._call.inputValues[2].value.toAddress();
+  }
+
+  get _routerExtension(): Address {
+    return this._call.inputValues[3].value.toAddress();
+  }
 }
 
 export class InitializeCall__Outputs {
   _call: InitializeCall;
 
   constructor(call: InitializeCall) {
+    this._call = call;
+  }
+}
+
+export class MakeUniCall extends ethereum.Call {
+  get inputs(): MakeUniCall__Inputs {
+    return new MakeUniCall__Inputs(this);
+  }
+
+  get outputs(): MakeUniCall__Outputs {
+    return new MakeUniCall__Outputs(this);
+  }
+}
+
+export class MakeUniCall__Inputs {
+  _call: MakeUniCall;
+
+  constructor(call: MakeUniCall) {
+    this._call = call;
+  }
+}
+
+export class MakeUniCall__Outputs {
+  _call: MakeUniCall;
+
+  constructor(call: MakeUniCall) {
+    this._call = call;
+  }
+}
+
+export class MakeXybkCall extends ethereum.Call {
+  get inputs(): MakeXybkCall__Inputs {
+    return new MakeXybkCall__Inputs(this);
+  }
+
+  get outputs(): MakeXybkCall__Outputs {
+    return new MakeXybkCall__Outputs(this);
+  }
+}
+
+export class MakeXybkCall__Inputs {
+  _call: MakeXybkCall;
+
+  constructor(call: MakeXybkCall) {
+    this._call = call;
+  }
+
+  get _newBoost0(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get _newBoost1(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+}
+
+export class MakeXybkCall__Outputs {
+  _call: MakeXybkCall;
+
+  constructor(call: MakeXybkCall) {
     this._call = call;
   }
 }
@@ -1066,5 +1434,159 @@ export class TransferFromCall__Outputs {
 
   get value0(): boolean {
     return this._call.outputValues[0].value.toBoolean();
+  }
+}
+
+export class UpdateBoostCall extends ethereum.Call {
+  get inputs(): UpdateBoostCall__Inputs {
+    return new UpdateBoostCall__Inputs(this);
+  }
+
+  get outputs(): UpdateBoostCall__Outputs {
+    return new UpdateBoostCall__Outputs(this);
+  }
+}
+
+export class UpdateBoostCall__Inputs {
+  _call: UpdateBoostCall;
+
+  constructor(call: UpdateBoostCall) {
+    this._call = call;
+  }
+
+  get _newBoost0(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get _newBoost1(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+}
+
+export class UpdateBoostCall__Outputs {
+  _call: UpdateBoostCall;
+
+  constructor(call: UpdateBoostCall) {
+    this._call = call;
+  }
+}
+
+export class UpdateDelayCall extends ethereum.Call {
+  get inputs(): UpdateDelayCall__Inputs {
+    return new UpdateDelayCall__Inputs(this);
+  }
+
+  get outputs(): UpdateDelayCall__Outputs {
+    return new UpdateDelayCall__Outputs(this);
+  }
+}
+
+export class UpdateDelayCall__Inputs {
+  _call: UpdateDelayCall;
+
+  constructor(call: UpdateDelayCall) {
+    this._call = call;
+  }
+
+  get _newDelay(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class UpdateDelayCall__Outputs {
+  _call: UpdateDelayCall;
+
+  constructor(call: UpdateDelayCall) {
+    this._call = call;
+  }
+}
+
+export class UpdateTradeFeesCall extends ethereum.Call {
+  get inputs(): UpdateTradeFeesCall__Inputs {
+    return new UpdateTradeFeesCall__Inputs(this);
+  }
+
+  get outputs(): UpdateTradeFeesCall__Outputs {
+    return new UpdateTradeFeesCall__Outputs(this);
+  }
+}
+
+export class UpdateTradeFeesCall__Inputs {
+  _call: UpdateTradeFeesCall;
+
+  constructor(call: UpdateTradeFeesCall) {
+    this._call = call;
+  }
+
+  get _newFee(): i32 {
+    return this._call.inputValues[0].value.toI32();
+  }
+}
+
+export class UpdateTradeFeesCall__Outputs {
+  _call: UpdateTradeFeesCall;
+
+  constructor(call: UpdateTradeFeesCall) {
+    this._call = call;
+  }
+}
+
+export class UpdateTradeStateCall extends ethereum.Call {
+  get inputs(): UpdateTradeStateCall__Inputs {
+    return new UpdateTradeStateCall__Inputs(this);
+  }
+
+  get outputs(): UpdateTradeStateCall__Outputs {
+    return new UpdateTradeStateCall__Outputs(this);
+  }
+}
+
+export class UpdateTradeStateCall__Inputs {
+  _call: UpdateTradeStateCall;
+
+  constructor(call: UpdateTradeStateCall) {
+    this._call = call;
+  }
+
+  get _tradeState(): i32 {
+    return this._call.inputValues[0].value.toI32();
+  }
+}
+
+export class UpdateTradeStateCall__Outputs {
+  _call: UpdateTradeStateCall;
+
+  constructor(call: UpdateTradeStateCall) {
+    this._call = call;
+  }
+}
+
+export class UpdateWithdrawalFeeRatioCall extends ethereum.Call {
+  get inputs(): UpdateWithdrawalFeeRatioCall__Inputs {
+    return new UpdateWithdrawalFeeRatioCall__Inputs(this);
+  }
+
+  get outputs(): UpdateWithdrawalFeeRatioCall__Outputs {
+    return new UpdateWithdrawalFeeRatioCall__Outputs(this);
+  }
+}
+
+export class UpdateWithdrawalFeeRatioCall__Inputs {
+  _call: UpdateWithdrawalFeeRatioCall;
+
+  constructor(call: UpdateWithdrawalFeeRatioCall) {
+    this._call = call;
+  }
+
+  get _newFeeRatio(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class UpdateWithdrawalFeeRatioCall__Outputs {
+  _call: UpdateWithdrawalFeeRatioCall;
+
+  constructor(call: UpdateWithdrawalFeeRatioCall) {
+    this._call = call;
   }
 }

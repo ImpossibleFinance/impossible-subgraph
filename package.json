@@ -1,16 +1,21 @@
 {
-  "name": "ifv3",
+  "name": "Impossible Finance SwapV3 Subgraph",
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --product hosted-service amanraj1608/Ifv3fast",
-    "create-local": "graph create --node http://localhost:8020/ amanraj1608/Ifv3fast",
-    "remove-local": "graph remove --node http://localhost:8020/ amanraj1608/Ifv3fast",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 amanraj1608/Ifv3fast"
+    "prepare:bsc": "mustache subgraph_config/bsc.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:bsc_constant": "mustache src/deployed_chain_config/bsc/bsc_constants.json src/deployed_chain_config/bsc/bsc_constants.template.ts > src/mappings/network_constants.ts",
+    "deploy": "graph deploy --product hosted-service masterbid/impossible-finance-v3",
+    "create-local": "graph create --node http://localhost:8020/ masterbid/impossible-finance-v3",
+    "remove-local": "graph remove --node http://localhost:8020/ masterbid/impossible-finance-v3",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 masterbid/impossible-finance-v3"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.21.1",
-    "@graphprotocol/graph-ts": "0.20.0"
+    "@graphprotocol/graph-cli": "0.28.0",
+    "@graphprotocol/graph-ts": "0.26.0"
+  },
+  "devDependencies": {
+    "mustache": "^3.1.0"
   }
 }
